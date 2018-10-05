@@ -18,10 +18,32 @@ do
 	readedPrice=$(echo ${registers[$i]} | cut -d ',' -f 16)
 
 	for item in "${alcohol[@]}"; do
-		if [[ $readedAlcohol == ${alcohol[$item]} ]];then
+		if [[ $readedAlcohol == ${item} ]];then
 			promedio=$(bc -l <<< $promedio+$pesoAlcohol)
 		fi
 	done
+	
+	for item in "${dressCode[@]}"; do
+		if [[ $readedDressCode == ${item} ]];then
+			promedio=$(bc -l <<< $promedio+$pesoDressCode)
+			break
+		fi
+	done
+
+	for item in "${accessibility[@]}"; do
+		if [[ $readedAccessibility == ${accessibility[$item]} ]];then
+			promedio=$(bc -l <<< $promedio+$pesoAccessibility)
+			break
+		fi
+	done
+
+	
+	if [[ ${promedio} > ${promedioMax} ]]; then
+		max=${registers[$i]}
+
+	elif [[ ${promedio} = ${promedioMax} ]];then
+		max+=${registers[$i]}
+	fi
 
 done
 $@
