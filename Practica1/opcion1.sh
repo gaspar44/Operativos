@@ -18,77 +18,78 @@ do
 	readedAccesibility=$(echo ${registers[$i]} | cut -d ',' -f 15)
 	readedPrice=$(echo ${registers[$i]} | cut -d ',' -f 16)
 
-	for item in "${alcohol[@]}"; do
-		if [[ $readedAlcohol == ${item} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoAlcohol)
-			break
-		fi
-	done
-	
-	for item in "${dressCode[@]}"; do
-		if [[ $readedDressCode == ${item} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoDressCode)
-			break
-		fi
+	rating=($(cat datos/rating_final.csv | grep $placeID | cut -d ',' -f 3))
+	promedioRating=0
+
+	for element in "${rating[@]}"; do
+		promedioRating=$(($promedioRating + $element))
 	done
 
-	for item in "${accessibility[@]}"; do
-		if [[ $readedAccessibility == ${accessibility[$item]} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoAccessibility)
-			break
+	promedioRating=$(bc -l <<< $promedioRating/${#rating[@]})
+
+	if [[ $promedioRating > 1 ]]; then
+		for item in "${alcohol[@]}"; do
+			if [[ $readedAlcohol == ${item} ]];then
+				promedio=$(bc -l <<< $promedio+$pesoAlcohol)
+				finalAlcohol=${item}
+				
+			fi
+		done
+
+
+		for item in "${price[@]}"; do
+			if [[ $readedPrice == ${$item} ]];then
+				promedio=$(bc -l <<< $promedio+$pesoPrice)
+				finalPrice=${item}
+				
+			fi
+		done
+
+		for item in "${smokingArea[@]}"; do
+			if [[ $readedDressCode == ${item} ]];then
+				promedio=$(bc -l <<< $promedio+$pesoSmokingArea)
+				finalSmokingArea=${item}
+				
+			fi
+		done
+		
+		for item in "${dressCode[@]}"; do
+			if [[ $readedDressCode == ${item} ]];then
+				promedio=$(bc -l <<< $promedio+$pesoDressCode)
+				finalDressCode=${item}
+				
+			fi
+		done
+
+
+		for item in "${accessibility[@]}"; do
+			if [[ $readedAccessibility == ${item} ]];then
+				promedio=$(bc -l <<< $promedio+$pesoAccessibility)
+				finalAccessibility=${item}
+				
+			fi
+		done
+
+		if [[ ${promedio} > ${promedioMax} ]]; then
+			max=${registers[$i]}
+			promedioMax=${promedio}
+
+		elif [[ ${promedio} = ${promedioMax} ]];then
+			max+=${registers[$i]}
 		fi
-	done
-
-	
-	if [[ ${promedio} > ${promedioMax} ]]; then
-		max=${registers[$i]}
-
-	elif [[ ${promedio} = ${promedioMax} ]];then
-		max+=${registers[$i]}
 	fi
 
-	for item in "${price[@]}"; do
-		if [[ $readedPrice == ${item} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoPrice)
-			break
-		fi
-	done
-
-	for item in "${smokingArea[@]}"; do
-		if [[ $readedAllowedSmoking == ${item} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoSmoingArea)
-			break
-		fi
-	done
-
-	for item in "${dressCode[@]}"; do
-		if [[ $readedDressCode == ${item} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoDressCode)
-			break
-		fi
-	done
-
-	for item in "${accessibility[@]}"; do
-		if [[ $readedAccessibility == ${accessibility[$item]} ]];then
-			promedio=$(bc -l <<< $promedio+$pesoAccessibility)
-			break
-		fi
-	done
-
-	if [[ $promedio -gt $promedioMax ]]; then
-		max=${registers[$i]}
-
-	else if [[ $promedio -eq $promedioMax ]];then
-		max+=${registers[$i]}
-	fi
 done
 
 if [[ ${#max[@]} == 1 ]]; then
-	echo $max
+	echo "Restaurante recomendado: " $(echo $max | cut -d "," -f 5) 0$promedioMax 
+	echo Alcohol: $finalAlcohol, price: $finalPrice, smokingArea: $finalSmokingArea, dressCode: $finalDressCode, accessibility: $finalAccessibility 
 
 else 
 	elementToShow=$(($RANDOM % ${#max[@]}))
-	echo ${max[$elementToShow]}
+	echo "Restaurante recomendado: " $(echo ${max[$elementToShow]} | cut -d ',' -f 5)
 fi
+
+echo ".................."
 
 $@
