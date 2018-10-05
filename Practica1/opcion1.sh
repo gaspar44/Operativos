@@ -16,7 +16,10 @@ do
 	readedDressCode=$(echo ${registers[$i]} | cut -d ',' -f 14)
 	readedAccesibility=$(echo ${registers[$i]} | cut -d ',' -f 15)
 	readedPrice=$(echo ${registers[$i]} | cut -d ',' -f 16)
-
+	
+	# Recordando que cada una de las variables donde se almacenan los valores deseados por los clientes
+	# Es necesario podedr iterar por cada una de las palabras en los arreglos
+	# Luego ver si es igual y proceder a sumar para cada variable de la lista
 	for item in "${alcohol[@]}"; do
 		if [[ $readedAlcohol == ${alcohol[$item]} ]];then
 			promedio=$(bc -l <<< $promedio+$pesoAlcohol)
