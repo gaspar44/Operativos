@@ -24,6 +24,28 @@ do
 			break
 		fi
 	done
+	
+	for item in "${dressCode[@]}"; do
+		if [[ $readedDressCode == ${item} ]];then
+			promedio=$(bc -l <<< $promedio+$pesoDressCode)
+			break
+		fi
+	done
+
+	for item in "${accessibility[@]}"; do
+		if [[ $readedAccessibility == ${accessibility[$item]} ]];then
+			promedio=$(bc -l <<< $promedio+$pesoAccessibility)
+			break
+		fi
+	done
+
+	
+	if [[ ${promedio} > ${promedioMax} ]]; then
+		max=${registers[$i]}
+
+	elif [[ ${promedio} = ${promedioMax} ]];then
+		max+=${registers[$i]}
+	fi
 
 	for item in "${price[@]}"; do
 		if [[ $readedPrice == ${item} ]];then
