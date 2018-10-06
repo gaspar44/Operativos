@@ -87,7 +87,9 @@ if [[ ${#max[@]} == 1 ]]; then
 
 else 
 	elementToShow=$(($RANDOM % ${#max[@]}))
-	echo "Restaurante recomendado: " $(echo ${max[$elementToShow]} | cut -d ',' -f 5)
+	echo "Restaurante recomendado: " $(echo ${max[$elementToShow]} | cut -d ',' -f 5) 0$promedioMax
+	echo Alcohol: $finalAlcohol, price: $finalPrice, smokingArea: $finalSmokingArea, dressCode: $finalDressCode, accessibility: $finalAccessibility 
+
 fi
 
 echo ".................."
