@@ -1,0 +1,6 @@
+*.o
+.vscode/*
+.settings/*
+.project
+.cproject
+main
