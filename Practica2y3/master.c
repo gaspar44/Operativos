@@ -18,7 +18,7 @@ void init() {
 	int numberOfClients = getNumberOfClients("./listado_html.txt");
 	int status;
 	pid_t createdClientsPID[numberOfClients];
-	pid_t idClients;
+
 
 	if ( (serverPID = fork() ) == - 1)
 		exit(1);
@@ -29,23 +29,7 @@ void init() {
 	}
 
 	else {
-
-		for (int i = 0; i < numberOfClients;i++){
-			if (PID == getpid()) {
-				idClients = fork();
-
-				if (idClients == -1)
-					exit(1);
-
-				else if( idClients == 0){
-					printf("Soy cliente y:%d\n",getpid());
-					exit(0);
-				}
-
-				else
-					createdClientsPID[i] = idClients;
-			}
-		}
+		createClients(createdClientsPID,numberOfClients,PID);
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -73,4 +57,26 @@ int getNumberOfClients(char* fileToRead){
 	fclose(readedFile);
 	return numberOfLines;
 
+}
+
+
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
+	pid_t idClients;
+	for (int i = 0; i < numberOfClients;i++){
+		if (PID == getpid()) {
+			idClients = fork();
+
+			if (idClients == -1)
+				exit(1);
+
+			else if( idClients == 0){
+				printf("Soy cliente y:%d\n",getpid());
+				exit(0);
+			}
+
+			else
+				createdClientsPID[i] = idClients;
+		}
+	}
+	return createdClientsPID;
 }
