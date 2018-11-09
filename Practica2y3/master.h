@@ -2,7 +2,6 @@
  * master.h
  *
  *  Created on: 6 nov. 2018
- *      Author: gaspar
  */
 
 #ifndef MASTER_H_

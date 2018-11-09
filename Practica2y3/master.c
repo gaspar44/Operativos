@@ -2,8 +2,8 @@
  * master.c
  *
  *  Created on: 6 nov. 2018
- *      Author: gaspar
  */
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 
 #include "master.h"
+#include "client.h"
 
 void init() {
 	int PID = getpid();
@@ -62,14 +63,26 @@ int getNumberOfClients(char* fileToRead){
 
 pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
 	pid_t idClients;
+	FILE* fileToRead= fopen("./listado_html.txt","r");
+	char* actualLine = NULL;
+	size_t lineSize = 0;
+	ssize_t charsInTheLine;
+
+	if (fileToRead == NULL)
+		exit(1);
+
 	for (int i = 0; i < numberOfClients;i++){
 		if (PID == getpid()) {
+			getline(&actualLine,&lineSize,fileToRead);
+			//printf("%s\n",actualLine );
+
 			idClients = fork();
 
 			if (idClients == -1)
 				exit(1);
 
 			else if( idClients == 0){
+				startClient(actualLine);
 				printf("Soy cliente y:%d\n",getpid());
 				exit(0);
 			}
