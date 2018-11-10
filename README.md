@@ -1,2 +1,2 @@
 # Operativos
-Repositorio donde se guardarán las practicas de SO
+Repositorio donde se guardarán las practicas de SO xd
