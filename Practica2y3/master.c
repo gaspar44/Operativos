@@ -20,7 +20,6 @@ void init() {
 	int status;
 	pid_t createdClientsPID[numberOfClients];
 
-
 	if ( (serverPID = fork() ) == - 1)
 		exit(1);
 
@@ -74,16 +73,13 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
 	for (int i = 0; i < numberOfClients;i++){
 		if (PID == getpid()) {
 			getline(&actualLine,&lineSize,fileToRead);
-			//printf("%s\n",actualLine );
 
-			idClients = fork();
-
-			if (idClients == -1)
+			if (( idClients = fork() ) == -1)
 				exit(1);
 
 			else if( idClients == 0){
-				startClient(actualLine);
 				printf("Soy cliente y:%d\n",getpid());
+				startClient(actualLine);
 				exit(0);
 			}
 
@@ -91,5 +87,6 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
 				createdClientsPID[i] = idClients;
 		}
 	}
+
 	return createdClientsPID;
 }

@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
 	else if (master == 0)
 		init();
 
-	else {
+	else
 		master = wait(&status);
-		return 0;
-	}
+
+	return 0;
 
 }
 
