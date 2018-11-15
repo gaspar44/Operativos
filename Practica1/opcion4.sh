@@ -17,6 +17,7 @@ declare -a accessibility
 read -p "Indique valores para price [M,H,L]: " auxiliarPrice
 auxiliarIterator=$(echo ${auxiliarPrice} | awk -F "," '{print NF-1}')
 
+
 for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 	temp=$(echo $auxiliarPrice | cut -d "," -f $((i+1)))
 
@@ -30,8 +31,9 @@ for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 		precio[i]="high"
 
 	else
-		echo "INGRESE UN PARAMETRO VÁLIDO"
-		exit 1
+		echo "VALOR $temp no valido"
+		clear
+		return
 	fi
 done
 
@@ -39,7 +41,8 @@ done
 read -p "Indique valores para dress_code [I,C,F]: " auxiliarDressCode
 auxiliarIterator=$(echo ${auxiliarPrice} | awk -F "," '{print NF-1}')
 
-for (i = 0; i < $((auxiliarIterator + 1));i++);do
+
+for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 	temp=$(echo $auxiliarDressCode | cut -d "," -f $((i+1)))
 
 	if [[ $temp = "I" ]]; then
@@ -48,12 +51,13 @@ for (i = 0; i < $((auxiliarIterator + 1));i++);do
 	elif [[ $temp = "C" ]]; then
 		dressCode[i]="casual"
 
-	elif [[ $temp ="F" ]]; then
+	elif [[ $temp = "F" ]]; then
 		dressCode[i]="formal"
 
 	else
-		echo "INGRESE UN PARAMETRO VÁLIDO"
-		exit(1);
+		echo "VALOR $temp no valido"
+		clear
+		return
 	fi
 done
 
@@ -61,21 +65,23 @@ done
 read -p "Indique valores para alcohol [N,W,F]: " auxiliarAlcohol
 auxiliarIterator=$(echo ${auxiliarPrice} | awk -F "," '{print NF-1}')
 
-for (i = 0; i < $((auxiliarIterator + 1));i++);do
+
+for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 	temp=$(echo $auxiliarAlcohol | cut -d "," -f $((i+1)))
 
 	if [[ $temp = "N" ]]; then
-		auxiliarAlcohol[i]="No_Alcohol_Served"
+		alcohol[i]="No_Alcohol_Served"
 
 	elif [[ $temp = "W" ]]; then
-		auxiliarAlcohol[i]="Wine-Beer"
+		alcohol[i]="Wine-Beer"
 
-	elif [[ $temp ="F" ]]; then
-		auxiliarAlcohol[i]="Full_Bar"
+	elif [[ $temp = "F" ]]; then
+		alcohol[i]="Full_Bar"
 
 	else
-		echo "INGRESE UN PARAMETRO VÁLIDO"
-		exit(1);
+		echo "VALOR $temp no valido"
+		clear
+		return
 	fi
 done
 
@@ -83,27 +89,29 @@ done
 read -p "Indique valores para smoking_area [0,B,P,S,N]: " auxiliarSmokingArea
 auxiliarIterator=$(echo ${auxiliarPrice} | awk -F "," '{print NF-1}')
 
-for (i = 0; i < $((auxiliarIterator + 1));i++);do
+
+for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 	temp=$(echo $auxiliarSmokingArea | cut -d "," -f $((i+1)))
 
 	if [[ $temp = "0" ]]; then
-		auxiliarSmokingArea[i]="none"
+		smokingArea[i]="none"
 
 	elif [[ $temp = "B" ]]; then
-		auxiliarSmokingArea[i]="only_at_bar"
+		smokingArea[i]="only_at_bar"
 
-	elif [[ $temp ="P" ]]; then
-		auxiliarSmokingArea[i]="permitted"
+	elif [[ $temp = "P" ]]; then
+		smokingArea[i]="permitted"
 
-	elif [[ $temp ="S" ]]; then
-		auxiliarSmokingArea[i]="section"
+	elif [[ $temp = "S" ]]; then
+		smokingArea[i]="section"
 
-	elif [[ $temp ="N" ]]; then
-		auxiliarSmokingArea[i]="not-permitted"
+	elif [[ $temp = "N" ]]; then
+		smokingArea[i]="not-permitted"
 
 	else
-		echo "INGRESE UN PARAMETRO VÁLIDO"
-		exit(1);
+		echo "VALOR $temp no valido"
+		clear
+		return
 	fi
 done
 
@@ -111,21 +119,23 @@ done
 read -p "Indique valores para accessibility [N,P,C]: " auxiliarAccessibility
 auxiliarIterator=$(echo ${auxiliarAccessibility} | awk -F "," '{print NF-1}')
 
-for (i = 0; i < $((auxiliarIterator + 1));i++);do
+
+for (( i = 0; i < $((auxiliarIterator + 1)); i++ ));do
 	temp=$(echo $auxiliarAlcohol | cut -d "," -f $((i+1)))
 
 	if [[ $temp = "N" ]]; then
-		auxiliarAccessibility[i]="no_accessibility"
+		accessibility[i]="no_accessibility"
 
 	elif [[ $temp = "P" ]]; then
-		auxiliarAccessibility[i]="partially"
+		accessibility[i]="partially"
 
-	elif [[ $temp ="C" ]]; then
-		auxiliarAccessibility[i]="completely"
+	elif [[ $temp = "C" ]]; then
+		accessibility[i]="completely"
 
 	else
-		echo "INGRESE UN PARAMETRO VÁLIDO"
-		exit(1);
+		echo "VALOR $temp no valido"
+		clear
+		return
 	fi
 done
 

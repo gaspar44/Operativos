@@ -30,7 +30,7 @@ while [[ true ]]; do
 
 		*)
 			clear
-			echo "error, pruebe de nuevo" ;;			
+			echo "error, pruebe de nuevo" ;;
 	esac
 
 done
