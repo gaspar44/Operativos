@@ -1,5 +1,6 @@
 #!/bin/bash
-source ./defaultParameters.sh $1
+configurationFile=$1
+source ./defaultParameters.sh $configurationFile
 
 while [[ true ]]; do
 	echo "1. Recomendación rápida de restaurante"
@@ -21,7 +22,6 @@ while [[ true ]]; do
 		3)
 			source ./opcion3.sh ;;
 
-
 		4)
 			source ./opcion4.sh ;;
 
@@ -31,7 +31,7 @@ while [[ true ]]; do
 
 		*)
 			clear
-			echo "error, pruebe de nuevo" ;;			
+			echo "error, pruebe de nuevo" ;;
 	esac
 
 done

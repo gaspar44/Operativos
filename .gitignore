@@ -1,6 +1,7 @@
 *.o
 .vscode/*
-.settings/*
+*/.settings/*
 .project
 .cproject
 main
+hola*.html.txt

@@ -1,7 +1,12 @@
 #!/bin/bash
-clear
-echo "Recomendación rápida de restaurante"
-echo "-----------"
+
+
+if [[ -z $1 ]]; then
+	clear
+	echo "Recomendación rápida de restaurante"
+	echo "-----------"
+fi
+
 
 # Leemos los archivos
 IFS=$'\n' registers=($(cat "datos/geoplaces2.csv"))
@@ -93,5 +98,3 @@ else
 fi
 
 echo ".................."
-
-$@

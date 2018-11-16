@@ -15,6 +15,3 @@ echo "Smoking areas: " $smokingArea
 echo "Alcohol services: " $alcohol
 echo "Dress codes: " $dressCode
 echo "Accessibilities: " $accessibility
-
-
-$@
