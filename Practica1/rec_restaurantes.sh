@@ -1,5 +1,6 @@
 #!/bin/bash
-source ./defaultParameters.sh $1
+configurationFile=$1
+source ./defaultParameters.sh $configurationFile
 
 while [[ true ]]; do
 	echo "1. Recomendación rápida de restaurante"
