@@ -172,7 +172,3 @@ if [[ -z $1 ]]; then
 
   	read -p "Presione cualquier tecla para continuar" variable
 fi
-
-
-#$@
->>>>>>> feature/Practica2
