@@ -18,7 +18,15 @@ void init() {
 	int serverPID;
 	int numberOfClients = getNumberOfClients("./listado_html.txt");
 	int status;
+	int requestPipes[numberOfClients][2];
+	int responsePipes[numberOfClients][2];
 	pid_t createdClientsPID[numberOfClients];
+
+	for (int i = 0 ; i < numberOfClients; i ++) {
+		pipe(requestPipes[i]);
+		pipe(responsePipes[i]);
+	}
+
 
 	if ( (serverPID = fork() ) == - 1)
 		exit(1);
