@@ -15,6 +15,6 @@ typedef struct serverPipes{
 
 void init();
 int getNumberOfClients(char* fileToRead);
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int masterPID);
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int requestToProxy[][2], int requestToServer[][2], int responseToProxy[][2], int responseToClient[][2] );
 
 #endif /* MASTER_H_ */

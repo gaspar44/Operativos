@@ -18,13 +18,21 @@ void init() {
 	int serverPID;
 	int numberOfClients = getNumberOfClients("./listado_html.txt");
 	int status;
-	int requestPipes[numberOfClients][2];
-	int responsePipes[numberOfClients][2];
 	pid_t createdClientsPID[numberOfClients];
 
+	// Se declaran los pipes a utilizar para emular comunicación cliente -> proxy -> server
+	int requestToProxy[numberOfClients][2];
+	int requestToServer[numberOfClients][2];
+	int responseToProxy[numberOfClients][2];
+	int responseToClient[numberOfClients][2];
+
+
+	// Creación de los pipes
 	for (int i = 0 ; i < numberOfClients; i ++) {
-		pipe(requestPipes[i]);
-		pipe(responsePipes[i]);
+		pipe(requestToProxy[i]);
+		pipe(requestToServer[i]);
+		pipe(responseToProxy[i]);
+		pipe(responseToClient[i]);
 	}
 
 
@@ -37,7 +45,7 @@ void init() {
 	}
 
 	else {
-		createClients(createdClientsPID,numberOfClients,PID);
+		createClients(createdClientsPID,numberOfClients,PID,requestToProxy,requestToServer,responseToProxy,responseToClient);
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -68,7 +76,7 @@ int getNumberOfClients(char* fileToRead){
 }
 
 
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int requestToProxy[][2], int requestToServer[][2], int responseToProxy[][2], int responseToClient[][2] ){
 	pid_t idClients;
 	FILE* fileToRead= fopen("./listado_html.txt","r");
 	char* actualLine = NULL;
@@ -86,8 +94,13 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID){
 				exit(1);
 
 			else if( idClients == 0){
-				printf("Soy cliente y:%d\n",getpid());
-				startClient(actualLine);
+				//printf("Soy cliente y:%d\n",getpid());
+				char mierda[8];
+
+				startClient(actualLine,requestToProxy[i],requestToServer[i],responseToProxy[i],responseToClient[i]);
+				close(requestToProxy[i][1]);
+				read(requestToProxy[i][0],&mierda,8);
+				printf("Soy cliente y :%s\n", mierda);
 				exit(0);
 			}
 
