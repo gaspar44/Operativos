@@ -24,12 +24,12 @@ void startClient(char* actualLine,int requestToProxy[2], int requestToServer[2],
 		printf("mierda %d\n",getpid());
 
 
-	int openedPipe = open(pipeToCreate,O_WRONLY|O_CREAT,0666);
+	/*int openedPipe = open(pipeToCreate,O_WRONLY|O_CREAT,0666);
 
 	if (openedPipe != -1)
-		write(openedPipe,clientPID,strlen(clientPID));
+		write(openedPipe,clientPID,strlen(clientPID));*/
 
 	write(requestToProxy[1],clientPID,strlen(clientPID));
 
-	close(openedPipe);
+	//close(openedPipe);
 }

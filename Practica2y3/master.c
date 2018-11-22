@@ -21,18 +21,21 @@ void init() {
 	pid_t createdClientsPID[numberOfClients];
 
 	// Se declaran los pipes a utilizar para emular comunicación cliente -> proxy -> server
-	int requestToProxy[numberOfClients][2];
-	int requestToServer[numberOfClients][2];
-	int responseToProxy[numberOfClients][2];
-	int responseToClient[numberOfClients][2];
+	int requestToServerFromProxy[2];
+	int responseToProxyFromServer[2];
+	int requestToProxyFromClient[numberOfClients][2];
+	int responseToClientFromProxy[numberOfClients][2];
+
+	if (pipe(requestToServerFromProxy) == -1 || pipe(responseToProxyFromServer) == -1){
+		perror("Error to create pipes");
+		exit(1);
+	}
 
 
 	// Creación de los pipes
 	for (int i = 0 ; i < numberOfClients; i ++) {
-		pipe(requestToProxy[i]);
-		pipe(requestToServer[i]);
-		pipe(responseToProxy[i]);
-		pipe(responseToClient[i]);
+		pipe(requestToProxyFromClient[i]);
+		pipe(responseToClientFromProxy[i]);
 	}
 
 
@@ -45,7 +48,7 @@ void init() {
 	}
 
 	else {
-		createClients(createdClientsPID,numberOfClients,PID,requestToProxy,requestToServer,responseToProxy,responseToClient);
+		createClients(createdClientsPID,numberOfClients,PID,requestToProxyFromClient,responseToClientFromProxy);
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -76,7 +79,7 @@ int getNumberOfClients(char* fileToRead){
 }
 
 
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int requestToProxy[][2], int requestToServer[][2], int responseToProxy[][2], int responseToClient[][2] ){
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int (*requestToProxyFromClient)[2], int (*responseToClientFromProxy)[2] ){
 	pid_t idClients;
 	FILE* fileToRead= fopen("./listado_html.txt","r");
 	char* actualLine = NULL;
@@ -94,13 +97,13 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int re
 				exit(1);
 
 			else if( idClients == 0){
-				//printf("Soy cliente y:%d\n",getpid());
-				char mierda[8];
+				printf("Soy cliente y:%d\n",getpid());
+				//char mierda[8];
 
-				startClient(actualLine,requestToProxy[i],requestToServer[i],responseToProxy[i],responseToClient[i]);
-				close(requestToProxy[i][1]);
-				read(requestToProxy[i][0],&mierda,8);
-				printf("Soy cliente y :%s\n", mierda);
+				//startClient(actualLine,requestToProxy[i],requestToServer[i],responseToProxy[i],responseToClient[i]);
+				//close(requestToProxy[i][1]);
+				//read(requestToProxy[i][0],&mierda,8);
+				//printf("Soy cliente y :%s\n", mierda);
 				exit(0);
 			}
 
