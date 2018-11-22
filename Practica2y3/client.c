@@ -18,5 +18,5 @@ void startClient(char* actualLine,int *requestToProxyFromClient, int *responseTo
 	int clientPID = getpid();
 
 	if (write(requestToProxyFromClient[1],&clientPID,sizeof(int)) <= 0)
-		perror("no salió bien");
+		perror("Error write to pipe");
 }

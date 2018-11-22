@@ -55,15 +55,14 @@ void init() {
 			perror("Error to create pipes");
 			exit(1);
 		}
-
 	}
-
 
 	if ( (serverPID = fork() ) == - 1)
 		exit(1);
 
 	else if (serverPID == 0) {
 		printf("Soy servidor: %d\n",getpid());
+		startServer(requestToServerFromProxy,responseToProxyFromServer);
 		exit(0);
 	}
 
@@ -75,7 +74,6 @@ void init() {
 			close(requestToProxyFromClient[i][1]);
 			read(requestToProxyFromClient[i][0],&magia,sizeof(int));
 			printf("Soy cliente por pipe y : %d\n", magia);
-
 		}
 
 		for (int i = 0; i < numberOfClients ;i++)
