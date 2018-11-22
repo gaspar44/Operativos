@@ -20,11 +20,29 @@ void init() {
 	int status;
 	pid_t createdClientsPID[numberOfClients];
 
-	// Se declaran los pipes a utilizar para emular comunicación cliente -> proxy -> server
+	/*
+	 * Se declaran los pipes a utilizar para emular comunicación cliente -> proxy -> server
+	 * Como la comunicación entre proxy -> master y master -> proxy es de un proceso, sólo es necesario un pipe para leer todo de master y viceversa
+	 *
+	 *
+	 * Estas reservas de memoria dinámica son debido a que es necesario poder guardar cada uno de los pipes que comunicarán cliente con
+	 * el master y viceversa por 2 pipes para cada uno de los hijos con master. Para evitar conflictos al momento de pasar argumentos a
+	 * las funciones respectivas que leen este código se manejan apuntadores, facilitando su modificación.
+	 *
+	 */
+
 	int requestToServerFromProxy[2];
 	int responseToProxyFromServer[2];
-	int requestToProxyFromClient[numberOfClients][2];
-	int responseToClientFromProxy[numberOfClients][2];
+	int **requestToProxyFromClient = malloc(numberOfClients * sizeof(int*));
+	int **responseToClientFromProxy = malloc(numberOfClients * sizeof(int*));
+
+	for (int i = 0; i < numberOfClients; ++i) {
+		int *temp = malloc(2*sizeof(int));
+		int *temp2 = malloc(2*sizeof(int));
+		*(requestToProxyFromClient + i) = temp;
+		*(responseToClientFromProxy + i) = temp2;
+
+	}
 
 	if (pipe(requestToServerFromProxy) == -1 || pipe(responseToProxyFromServer) == -1){
 		perror("Error to create pipes");
@@ -32,10 +50,12 @@ void init() {
 	}
 
 
-	// Creación de los pipes
 	for (int i = 0 ; i < numberOfClients; i ++) {
-		pipe(requestToProxyFromClient[i]);
-		pipe(responseToClientFromProxy[i]);
+		if (pipe(requestToProxyFromClient[i]) == -1 || pipe(responseToClientFromProxy[i]) == -1){
+			perror("Error to create pipes");
+			exit(1);
+		}
+
 	}
 
 
@@ -49,6 +69,14 @@ void init() {
 
 	else {
 		createClients(createdClientsPID,numberOfClients,PID,requestToProxyFromClient,responseToClientFromProxy);
+
+		for (int i = 0; i < numberOfClients; i++) {
+			int magia;
+			close(requestToProxyFromClient[i][1]);
+			read(requestToProxyFromClient[i][0],&magia,sizeof(int));
+			printf("Soy cliente por pipe y : %d\n", magia);
+
+		}
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -79,7 +107,7 @@ int getNumberOfClients(char* fileToRead){
 }
 
 
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int (*requestToProxyFromClient)[2], int (*responseToClientFromProxy)[2] ){
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int **requestToProxyFromClient, int **responseToClientFromProxy) {
 	pid_t idClients;
 	FILE* fileToRead= fopen("./listado_html.txt","r");
 	char* actualLine = NULL;
@@ -97,13 +125,7 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int (*
 				exit(1);
 
 			else if( idClients == 0){
-				printf("Soy cliente y:%d\n",getpid());
-				//char mierda[8];
-
-				//startClient(actualLine,requestToProxy[i],requestToServer[i],responseToProxy[i],responseToClient[i]);
-				//close(requestToProxy[i][1]);
-				//read(requestToProxy[i][0],&mierda,8);
-				//printf("Soy cliente y :%s\n", mierda);
+				startClient(actualLine,requestToProxyFromClient[i],responseToClientFromProxy[i]);
 				exit(0);
 			}
 

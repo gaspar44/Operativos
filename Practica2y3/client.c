@@ -12,24 +12,11 @@
 
 #include "client.h"
 
-void startClient(char* actualLine,int requestToProxy[2], int requestToServer[2], int responseToProxy[2], int responseToClient[2]){
-	char pipeToCreate[15];
-	char clientPID[8];
-	sprintf(clientPID,"%d",getpid());
-	strcpy(pipeToCreate,actualLine);
-	strtok(pipeToCreate,"\r\n");
-	strcat(pipeToCreate,".txt");
+void startClient(char* actualLine,int *requestToProxyFromClient, int *responseToClientFromProxy){
+	close(requestToProxyFromClient[0]);
+	close(responseToClientFromProxy[1]);
+	int clientPID = getpid();
 
-	if (close(requestToProxy[0]) == -1)
-		printf("mierda %d\n",getpid());
-
-
-	/*int openedPipe = open(pipeToCreate,O_WRONLY|O_CREAT,0666);
-
-	if (openedPipe != -1)
-		write(openedPipe,clientPID,strlen(clientPID));*/
-
-	write(requestToProxy[1],clientPID,strlen(clientPID));
-
-	//close(openedPipe);
+	if (write(requestToProxyFromClient[1],&clientPID,sizeof(int)) <= 0)
+		perror("no salió bien");
 }
