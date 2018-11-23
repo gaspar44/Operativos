@@ -12,6 +12,7 @@
 
 #include "master.h"
 #include "client.h"
+#include "server.h"
 
 void init() {
 	int PID = getpid();
@@ -31,27 +32,27 @@ void init() {
 	 *
 	 */
 
-	int requestToServerFromProxy[2];
-	int responseToProxyFromServer[2];
-	int **requestToProxyFromClient = malloc(numberOfClients * sizeof(int*));
-	int **responseToClientFromProxy = malloc(numberOfClients * sizeof(int*));
+	int aceptarAccesoServidor[2];
+	int solicitudAccesoServidor[2];
+	int **listaPipesPeticion = malloc(numberOfClients * sizeof(int*));
+	int **listaPipesRespuesta = malloc(numberOfClients * sizeof(int*));
 
 	for (int i = 0; i < numberOfClients; ++i) {
 		int *temp = malloc(2*sizeof(int));
 		int *temp2 = malloc(2*sizeof(int));
-		*(requestToProxyFromClient + i) = temp;
-		*(responseToClientFromProxy + i) = temp2;
+		*(listaPipesPeticion + i) = temp;
+		*(listaPipesRespuesta + i) = temp2;
 
 	}
 
-	if (pipe(requestToServerFromProxy) == -1 || pipe(responseToProxyFromServer) == -1){
+	if (pipe(aceptarAccesoServidor) == -1 || pipe(solicitudAccesoServidor) == -1){
 		perror("Error to create pipes");
 		exit(1);
 	}
 
 
 	for (int i = 0 ; i < numberOfClients; i ++) {
-		if (pipe(requestToProxyFromClient[i]) == -1 || pipe(responseToClientFromProxy[i]) == -1){
+		if (pipe(listaPipesPeticion[i]) == -1 || pipe(listaPipesRespuesta[i]) == -1){
 			perror("Error to create pipes");
 			exit(1);
 		}
@@ -62,17 +63,17 @@ void init() {
 
 	else if (serverPID == 0) {
 		printf("Soy servidor: %d\n",getpid());
-		startServer(requestToServerFromProxy,responseToProxyFromServer);
+		startServer(numberOfClients,aceptarAccesoServidor,solicitudAccesoServidor,listaPipesPeticion,listaPipesRespuesta);
 		exit(0);
 	}
 
 	else {
-		createClients(createdClientsPID,numberOfClients,PID,requestToProxyFromClient,responseToClientFromProxy);
+		createClients(createdClientsPID,numberOfClients,PID,listaPipesPeticion,listaPipesRespuesta);
 
 		for (int i = 0; i < numberOfClients; i++) {
 			int magia;
-			close(requestToProxyFromClient[i][1]);
-			read(requestToProxyFromClient[i][0],&magia,sizeof(int));
+			close(listaPipesPeticion[i][1]);
+			read(listaPipesPeticion[i][0],&magia,sizeof(int));
 			printf("Soy cliente por pipe y : %d\n", magia);
 		}
 
@@ -105,7 +106,7 @@ int getNumberOfClients(char* fileToRead){
 }
 
 
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int **requestToProxyFromClient, int **responseToClientFromProxy) {
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int **listaPipesPeticion, int **listaPipesRespuesta) {
 	pid_t idClients;
 	FILE* fileToRead= fopen("./listado_html.txt","r");
 	char* actualLine = NULL;
@@ -118,12 +119,15 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int **
 	for (int i = 0; i < numberOfClients;i++){
 		if (PID == getpid()) {
 			getline(&actualLine,&lineSize,fileToRead);
+			// Create future pipe
 
 			if (( idClients = fork() ) == -1)
 				exit(1);
 
 			else if( idClients == 0){
-				startClient(actualLine,requestToProxyFromClient[i],responseToClientFromProxy[i]);
+				// Aquí se cerrará el pipe de escritura, se leerá el proceso y se guardará aquí
+
+				startClient(actualLine,listaPipesPeticion[i],listaPipesRespuesta[i]);
 				exit(0);
 			}
 
