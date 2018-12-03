@@ -2,11 +2,13 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
+
 #include "server.h"
 
 defaultPipes defaultpipes;
 sem_t semaforo1;
 int contThread = 0;
+
 void* threadCreation(void *arg){
 	sem_wait(&semaforo1);
 	contThread = contThread + 1;
@@ -34,5 +36,4 @@ void startServer(int numberOfClients, int *aceptarAccesoServidor,int *solicitudA
 		pthread_join(clientThreads[i],NULL);
 	}
 
-	printf("finalizado: %d\n", contThread);
 }

@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 
 #include "master.h"
 #include "client.h"
@@ -68,14 +69,15 @@ void init() {
 	}
 
 	else {
-		createClients(createdClientsPID,numberOfClients,PID,listaPipesPeticion,listaPipesRespuesta);
+		createClients(createdClientsPID,numberOfClients,PID,aceptarAccesoServidor,solicitudAccesoServidor,
+				listaPipesPeticion,listaPipesRespuesta);
 
-		for (int i = 0; i < numberOfClients; i++) {
+		/*for (int i = 0; i < numberOfClients; i++) {
 			int magia;
 			close(listaPipesPeticion[i][1]);
 			read(listaPipesPeticion[i][0],&magia,sizeof(int));
 			printf("Soy cliente por pipe y : %d\n", magia);
-		}
+		}*/
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -106,33 +108,44 @@ int getNumberOfClients(char* fileToRead){
 }
 
 
-pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int **listaPipesPeticion, int **listaPipesRespuesta) {
+pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int *aceptarAccesoServidor,int *solicitudAccesoServidor,
+		int **listaPipesPeticion,int **listaPipesRespuesta){
 	pid_t idClients;
 	FILE* fileToRead= fopen("./listado_html.txt","r");
 	char* actualLine = NULL;
+	char* readedLine = NULL;
 	size_t lineSize = 0;
 	ssize_t charsInTheLine;
+	int pipeToClient[2];
 
 	if (fileToRead == NULL)
 		exit(1);
 
 	for (int i = 0; i < numberOfClients;i++){
 		if (PID == getpid()) {
-			getline(&actualLine,&lineSize,fileToRead);
-			// Create future pipe
+			getline(&readedLine,&lineSize,fileToRead);
 
-			if (( idClients = fork() ) == -1)
+			if ( ( pipe(pipeToClient) ) == -1 || ( idClients = fork() ) == -1)
 				exit(1);
 
 			else if( idClients == 0){
-				// Aquí se cerrará el pipe de escritura, se leerá el proceso y se guardará aquí
+				close(pipeToClient[1]);
+				read(pipeToClient[0],&actualLine,10);
+				close(pipeToClient[0]);
 
-				startClient(actualLine,listaPipesPeticion[i],listaPipesRespuesta[i]);
+				startClient(actualLine,aceptarAccesoServidor, solicitudAccesoServidor,
+						listaPipesPeticion,listaPipesRespuesta);
 				exit(0);
 			}
 
-			else
+			else{
 				createdClientsPID[i] = idClients;
+
+				close(pipeToClient[0]);
+				write(pipeToClient[1],&readedLine,strlen(readedLine));
+				close(pipeToClient[1]);
+			}
+
 		}
 	}
 
