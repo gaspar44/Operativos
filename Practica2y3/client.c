@@ -20,13 +20,13 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	char* serverAnswerByByte = NULL;
 	char* serverAnswer = NULL;
 
-	printf("%s + %d\n ",actualLine,clientPID);
+	printf("%s\n ",actualLine);
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
 
 	read(aceptarAccesoServidor[0],&pipeIDForListaPipe,sizeof(int));
-
+	printf("leído: %d\n ",pipeIDForListaPipe);
 	close(listaPipesPeticion[pipeIDForListaPipe][0]);
 	close(listaPipesRespuesta[pipeIDForListaPipe][1]);
 
@@ -35,6 +35,6 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	while ( read(listaPipesRespuesta[pipeIDForListaPipe][0],serverAnswerByByte,1) > 0 ) {
 		strcpy(serverAnswer,serverAnswerByByte);
 	}
-
+	printf("hello: %s\n",serverAnswerByByte);
 
 }
