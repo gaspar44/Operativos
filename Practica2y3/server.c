@@ -8,7 +8,11 @@
 
 defaultPipes defaultpipes;
 sem_t clientSemaphore;
-int contThread = 0;
+int *globalAceptarAccesoServidor;
+int *globalSolicitudAccesoServidor;
+int **globalListaPipesPeticion;
+int **globalListaPipesRespuesta;
+
 
 /*void* threadCreation(void *arg){
 	sem_wait(&semaforo1);
@@ -52,3 +56,12 @@ void startServer(int numberOfClients, int *aceptarAccesoServidor,int *solicitudA
 	}
 
 }
+
+void setGlobalPipes(int *aceptarAccesoServidor,int *solicitudAccesoServidor,int **listaPipesPeticion,int **listaPipesRespuesta){
+	globalAceptarAccesoServidor=aceptarAccesoServidor;
+	globalSolicitudAccesoServidor=solicitudAccesoServidor;
+	globalListaPipesPeticion=listaPipesPeticion;
+	globalListaPipesRespuesta=listaPipesRespuesta;
+
+}
+

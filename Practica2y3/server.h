@@ -5,5 +5,5 @@ typedef struct defaultPipes{
 
 } defaultPipes;
 void startServer(int numberOfClients, int *aceptarAccesoServidor,int *solicitudAccesoServidor,int **listaPipesPeticion,int **listaPipesRespuesta);
-
+void setGlobalPipes(int *aceptarAccesoServidor,int *solicitudAccesoServidor,int **listaPipesPeticion,int **listaPipesRespuesta);
 #endif /* SERVER_H_ */
