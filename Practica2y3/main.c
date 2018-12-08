@@ -2,7 +2,6 @@
  * main.c
  *
  *  Created on: 6 nov. 2018
- *      Author: gaspar
  */
 
 #include <unistd.h>

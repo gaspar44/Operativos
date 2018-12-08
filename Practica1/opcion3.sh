@@ -10,8 +10,8 @@ echo "Peso alcohol :" $pesoAlcohol
 echo "Peso dress code: " $pesoDressCode
 echo "Peso accessibility: " $pesoAccessibility
 echo "-------"
-echo "Precios: " $precio
-echo "Smoking areas: " $smokingArea
-echo "Alcohol services: " $alcohol
-echo "Dress codes: " $dressCode
-echo "Accessibilities: " $accessibility
+echo "Precios: " ${precio[@]}
+echo "Smoking areas: " ${smokingArea[@]}
+echo "Alcohol services: " ${alcohol[@]}
+echo "Dress codes: " ${dressCode[@]}
+echo "Accessibilities: " ${accessibility[@]}

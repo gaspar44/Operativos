@@ -18,13 +18,17 @@ while [[ $whileCondition -lt 6 ]]; do
 	declare -a smokingArea
 	declare -a dressCode
 	declare -a accessibility
+
+	if [[ -z $1 ]]; then
+		read -p "Indique valores para price [M,H,L]: " auxiliarPrice
+	fi
 	
-	read -p "Indique valores para price [M,H,L]: " auxiliarPrice
 	auxiliarIterator=$(echo ${auxiliarPrice} | awk -F "," '{print NF-1}')
 
 
 	for (( i = 0; i < $((auxiliarIterator + 1)); i++ )); do
 		temp=$(echo $auxiliarPrice | cut -d "," -f $((i+1)))
+		echo $((auxiliarIterator + 1))
 
 		if [[ $temp = "M" ]]; then
 			precio[i]="medium"
@@ -44,8 +48,10 @@ while [[ $whileCondition -lt 6 ]]; do
 	done
 	whileCondition=$((whileCondition + 1))
 
-
-	read -p "Indique valores para dress_code [I,C,F]: " auxiliarDressCode
+	if [[ -z $ ]]; then
+		read -p "Indique valores para dress_code [I,C,F]: " auxiliarDressCode
+	fi
+	
 	auxiliarIterator=$(echo ${auxiliarDressCode} | awk -F "," '{print NF-1}')
 
 
@@ -70,7 +76,10 @@ while [[ $whileCondition -lt 6 ]]; do
 	done
 	whileCondition=$((whileCondition + 1))
 
-	read -p "Indique valores para alcohol [N,W,F]: " auxiliarAlcohol
+	if [[ -z $1 ]]; then
+		read -p "Indique valores para alcohol [N,W,F]: " auxiliarAlcohol
+	fi
+	
 	auxiliarIterator=$(echo ${auxiliarAlcohol} | awk -F "," '{print NF-1}')
 
 
@@ -96,8 +105,10 @@ while [[ $whileCondition -lt 6 ]]; do
 
 	whileCondition=$((whileCondition + 1))
 
-
-	read -p "Indique valores para smoking_area [0,B,P,S,N]: " auxiliarSmokingArea
+	if [[ -z $1 ]]; then
+		read -p "Indique valores para smoking_area [0,B,P,S,N]: " auxiliarSmokingArea
+	fi
+	
 	auxiliarIterator=$(echo ${auxiliarSmokingArea} | awk -F "," '{print NF-1}')
 
 
@@ -128,8 +139,10 @@ while [[ $whileCondition -lt 6 ]]; do
 	done
 	whileCondition=$((whileCondition + 1))
 
-
-	read -p "Indique valores para accessibility [N,P,C]: " auxiliarAccessibility
+	if [[ -z $1 ]]; then
+		read -p "Indique valores para accessibility [N,P,C]: " auxiliarAccessibility
+	fi
+	
 	auxiliarIterator=$(echo ${auxiliarAccessibility} | awk -F "," '{print NF-1}')
 
 
