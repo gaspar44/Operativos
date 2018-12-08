@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <string.h>
+#include <fcntl.h>
 
 #include "server.h"
 
@@ -14,7 +16,7 @@ int *globalSolicitudAccesoServidor;
 int **globalListaPipesPeticion;
 int **globalListaPipesRespuesta;
 
-int getClientPipeIndex(){
+int getClientAvaliablePipeIndex(){
 	for (int indexToReturn = 0; indexToReturn < 5; indexToReturn++){
 
 		if (defaultpipes.pipesLibres[indexToReturn] == 1){
@@ -30,17 +32,32 @@ void *startService(void *arg){
 	int* pointerToactualClientIndex = (int*) arg;
 	int actualClientIndex = *pointerToactualClientIndex;
 	free(pointerToactualClientIndex);
+
 	int pipeToSendToClient;
+	char fileNameToReadReciveFromClient[10];
+	int openedFileDescriptorToRead;
 
 	sem_wait(&clientSemaphore);
 
-	while ( (pipeToSendToClient = getClientPipeIndex() ) == -1 ){}
+	while ( (pipeToSendToClient = getClientAvaliablePipeIndex() ) == -1 );
 
 	sem_post(&clientSemaphore);
 
 
 	write(globalAceptarAccesoServidor[1],&pipeToSendToClient,sizeof(int));
 	printf("mi actualClientIndex es: %d y el pipe es: %d\n",actualClientIndex,pipeToSendToClient);
+
+	read(globalListaPipesPeticion[pipeToSendToClient][0],fileNameToReadReciveFromClient,10);
+	printf("el hilo del servidor leyó: %s\n",fileNameToReadReciveFromClient);
+
+	openedFileDescriptorToRead = open(fileNameToReadReciveFromClient,O_RDONLY);
+
+	if (openedFileDescriptorToRead == -1){
+		perror("Archivo no encontrado");
+		exit(1);
+	}
+
+
 
 	pthread_exit(0);
 

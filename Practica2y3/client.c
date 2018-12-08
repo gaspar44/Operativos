@@ -12,29 +12,45 @@
 
 #include "client.h"
 
+void closeUnnecessaryPipes(int **listaPipesPeticion,int **listaPipesRespuesta,int pipeIDForListaPipe){
+	close(listaPipesPeticion[pipeIDForListaPipe][0]);
+	close(listaPipesRespuesta[pipeIDForListaPipe][1]);
+}
+
+void getFileNameOfAnswer(int clientPID){
+	char stringedClientPID[4];
+	char fileAnswerToCreate[100];
+	strcpy(fileAnswerToCreate,"salida_pid_");
+	sprintf(stringedClientPID,"%d",clientPID);
+	strcat(fileAnswerToCreate,stringedClientPID);
+	strcat(fileAnswerToCreate,"_cliente.html");
+	printf("magia %s\n", fileAnswerToCreate);
+}
+
 void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAccesoServidor,int **listaPipesPeticion,int **listaPipesRespuesta){
 	close(aceptarAccesoServidor[1]);
 	close(solicitudAccesoServidor[0]);
 	int clientPID = getpid();
 	int pipeIDForListaPipe;
+
 	char* serverAnswerByByte = NULL;
 	char* serverAnswer = NULL;
+	/*char *fileAnswer = */getFileNameOfAnswer(clientPID);
 
-	printf("%s\n ",actualLine);
+	printf("%s\n",actualLine);
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
 
 	read(aceptarAccesoServidor[0],&pipeIDForListaPipe,sizeof(int));
 	printf("leído: %d\n ",pipeIDForListaPipe);
-	close(listaPipesPeticion[pipeIDForListaPipe][0]);
-	close(listaPipesRespuesta[pipeIDForListaPipe][1]);
+	closeUnnecessaryPipes(listaPipesPeticion,listaPipesRespuesta,pipeIDForListaPipe);
 
 	write(listaPipesPeticion[pipeIDForListaPipe][1],actualLine,strlen(actualLine));
 
 	while ( read(listaPipesRespuesta[pipeIDForListaPipe][0],serverAnswerByByte,1) > 0 ) {
 		strcpy(serverAnswer,serverAnswerByByte);
 	}
-	printf("hello: %s\n",serverAnswerByByte);
+	printf("hello: %s\n",serverAnswer);
 
 }
