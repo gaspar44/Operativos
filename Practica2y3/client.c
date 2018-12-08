@@ -17,14 +17,13 @@ void closeUnnecessaryPipes(int **listaPipesPeticion,int **listaPipesRespuesta,in
 	close(listaPipesRespuesta[pipeIDForListaPipe][1]);
 }
 
-void getFileNameOfAnswer(int clientPID){
+void getFileNameOfAnswer(int clientPID,char* fileAnswerToCreate){
 	char stringedClientPID[4];
-	char fileAnswerToCreate[100];
 	strcpy(fileAnswerToCreate,"salida_pid_");
 	sprintf(stringedClientPID,"%d",clientPID);
 	strcat(fileAnswerToCreate,stringedClientPID);
 	strcat(fileAnswerToCreate,"_cliente.html");
-	printf("magia %s\n", fileAnswerToCreate);
+
 }
 
 void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAccesoServidor,int **listaPipesPeticion,int **listaPipesRespuesta){
@@ -35,9 +34,11 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 
 	char* serverAnswerByByte = NULL;
 	char* serverAnswer = NULL;
-	/*char *fileAnswer = */getFileNameOfAnswer(clientPID);
+	char *fileAnswer = calloc(100,1);
+	getFileNameOfAnswer(clientPID,fileAnswer);
 
 	printf("%s\n",actualLine);
+	printf("archivo de salida es: %s\n",fileAnswer);
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
