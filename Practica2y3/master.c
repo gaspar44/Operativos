@@ -73,8 +73,10 @@ void init() {
 		createClients(createdClientsPID,numberOfClients,PID,aceptarAccesoServidor,solicitudAccesoServidor,
 				listaPipesPeticion,listaPipesRespuesta);
 
-		for (int i = 0; i < numberOfClients ;i++)
+		for (int i = 0; i < numberOfClients ;i++){
 			waitpid(createdClientsPID[i],&status,0);
+			printf("Cliente con PID %d terminado\n",createdClientsPID[i]);
+		}
 
 		waitpid(serverPID,&status,0);
 

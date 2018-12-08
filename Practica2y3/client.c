@@ -39,9 +39,9 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 
 	int exitFile = open(fileAnswer,O_WRONLY|O_APPEND|O_CREAT,0666);
 
-	//close(1);
-	//dup(exitFile);
-	//close(exitFile);
+	close(1);
+	dup(exitFile);
+	close(exitFile);
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
@@ -54,7 +54,7 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 
 	while ( bytesToRead != 0) {
 		read(listaPipesRespuesta[pipeIDForListaPipe][0],&serverAnswerByByte,1);
-		printf("%s",&serverAnswerByByte); // No muestra, hasta que haya salto de línea
+		printf("%c",serverAnswerByByte);
 		bytesToRead--;
 	}
 

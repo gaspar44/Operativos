@@ -54,7 +54,6 @@ void *startService(void *arg){
 		write(globalListaPipesRespuesta[pipeToSendToClient][1],&readedByteFromFile,1);
 	}
 
-	printf("misión cumplida\n");
 	freePipes(pipeToSendToClient);
 
 	pthread_exit(0);
