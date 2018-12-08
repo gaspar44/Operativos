@@ -34,7 +34,7 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 
 	char* serverAnswerByByte = NULL;
 	char* serverAnswer = NULL;
-	char *fileAnswer = calloc(100,1);
+	char *fileAnswer = malloc(100*sizeof(char));
 	getFileNameOfAnswer(clientPID,fileAnswer);
 
 	printf("%s\n",actualLine);
@@ -48,9 +48,17 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	closeUnnecessaryPipes(listaPipesPeticion,listaPipesRespuesta,pipeIDForListaPipe);
 
 	write(listaPipesPeticion[pipeIDForListaPipe][1],actualLine,strlen(actualLine));
+	int flagForStrCpy = 1;
 
 	while ( read(listaPipesRespuesta[pipeIDForListaPipe][0],serverAnswerByByte,1) > 0 ) {
-		strcpy(serverAnswer,serverAnswerByByte);
+		if (flagForStrCpy){
+			strcpy(serverAnswer,serverAnswerByByte);
+			flagForStrCpy = 0;
+		}
+
+		else
+			strcat(serverAnswer,serverAnswerByByte);
+
 	}
 	printf("hello: %s\n",serverAnswer);
 
