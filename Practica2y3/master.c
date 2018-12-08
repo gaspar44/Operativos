@@ -75,11 +75,12 @@ void init() {
 
 		for (int i = 0; i < numberOfClients ;i++){
 			waitpid(createdClientsPID[i],&status,0);
-			printf("Cliente con PID %d terminado\n",createdClientsPID[i]);
+			printf("Cliente con PID %d terminado, favor revisar el archivo de salida con este PID\n",createdClientsPID[i]);
 		}
 
 		waitpid(serverPID,&status,0);
-
+		free(listaPipesPeticion);
+		free(listaPipesRespuesta);
 	}
 
 }
