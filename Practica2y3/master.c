@@ -63,21 +63,15 @@ void init() {
 		exit(1);
 
 	else if (serverPID == 0) {
-		printf("Soy servidor: %d\n",getpid());
+		printf("Servidor creado con PID: %d\n",getpid());
 		startServer(numberOfClients,aceptarAccesoServidor,solicitudAccesoServidor,listaPipesPeticion,listaPipesRespuesta);
+		printf("Servidor acabado\n");
 		exit(0);
 	}
 
 	else {
 		createClients(createdClientsPID,numberOfClients,PID,aceptarAccesoServidor,solicitudAccesoServidor,
 				listaPipesPeticion,listaPipesRespuesta);
-
-		/*for (int i = 0; i < numberOfClients; i++) {
-			int magia;
-			close(listaPipesPeticion[i][1]);
-			read(listaPipesPeticion[i][0],&magia,sizeof(int));
-			printf("Soy cliente por pipe y : %d\n", magia);
-		}*/
 
 		for (int i = 0; i < numberOfClients ;i++)
 			waitpid(createdClientsPID[i],&status,0);
@@ -129,6 +123,7 @@ pid_t* createClients(pid_t* createdClientsPID,int numberOfClients,int PID,int *a
 				exit(1);
 
 			else if( idClients == 0){
+				printf("Cliente con PID: %d creado\n",getpid());
 				close(pipeToClient[1]);
 				read(pipeToClient[0],&actualLine,10);
 				close(pipeToClient[0]);

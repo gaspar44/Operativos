@@ -31,35 +31,31 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	close(solicitudAccesoServidor[0]);
 	int clientPID = getpid();
 	int pipeIDForListaPipe;
+	int bytesToRead;
 
-	char* serverAnswerByByte = NULL;
-	char* serverAnswer = NULL;
+	char serverAnswerByByte;
 	char *fileAnswer = malloc(100*sizeof(char));
 	getFileNameOfAnswer(clientPID,fileAnswer);
 
-	printf("%s\n",actualLine);
-	printf("archivo de salida es: %s\n",fileAnswer);
+	int exitFile = open(fileAnswer,O_WRONLY|O_APPEND|O_CREAT,0666);
+
+	//close(1);
+	//dup(exitFile);
+	//close(exitFile);
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
 
 	read(aceptarAccesoServidor[0],&pipeIDForListaPipe,sizeof(int));
-	printf("leído: %d\n ",pipeIDForListaPipe);
 	closeUnnecessaryPipes(listaPipesPeticion,listaPipesRespuesta,pipeIDForListaPipe);
 
 	write(listaPipesPeticion[pipeIDForListaPipe][1],actualLine,strlen(actualLine));
-	int flagForStrCpy = 1;
+	read(listaPipesRespuesta[pipeIDForListaPipe][0],&bytesToRead,sizeof(int));
 
-	while ( read(listaPipesRespuesta[pipeIDForListaPipe][0],serverAnswerByByte,1) > 0 ) {
-		if (flagForStrCpy){
-			strcpy(serverAnswer,serverAnswerByByte);
-			flagForStrCpy = 0;
-		}
-
-		else
-			strcat(serverAnswer,serverAnswerByByte);
-
+	while ( bytesToRead != 0) {
+		read(listaPipesRespuesta[pipeIDForListaPipe][0],&serverAnswerByByte,1);
+		printf("%s",&serverAnswerByByte); // No muestra, hasta que haya salto de línea
+		bytesToRead--;
 	}
-	printf("hello: %s\n",serverAnswer);
 
 }

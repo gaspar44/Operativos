@@ -8,6 +8,7 @@
 
 #include "server.h"
 
+// Global variables
 defaultPipes defaultpipes;
 sem_t clientSemaphore;
 
@@ -16,17 +17,7 @@ int *globalSolicitudAccesoServidor;
 int **globalListaPipesPeticion;
 int **globalListaPipesRespuesta;
 
-int getClientAvaliablePipeIndex(){
-	for (int indexToReturn = 0; indexToReturn < 5; indexToReturn++){
 
-		if (defaultpipes.pipesLibres[indexToReturn] == 1){
-			defaultpipes.pipesLibres[indexToReturn] = 0;
-			return indexToReturn;
-		}
-
-	}
-	return -1;
-}
 
 void *startService(void *arg){
 	int* pointerToactualClientIndex = (int*) arg;
@@ -35,6 +26,7 @@ void *startService(void *arg){
 
 	int pipeToSendToClient;
 	char fileNameToReadReciveFromClient[10];
+	char readedByteFromFile;
 	int openedFileDescriptorToRead;
 
 	sem_wait(&clientSemaphore);
@@ -45,22 +37,27 @@ void *startService(void *arg){
 
 
 	write(globalAceptarAccesoServidor[1],&pipeToSendToClient,sizeof(int));
-	printf("mi actualClientIndex es: %d y el pipe es: %d\n",actualClientIndex,pipeToSendToClient);
-
 	read(globalListaPipesPeticion[pipeToSendToClient][0],fileNameToReadReciveFromClient,10);
-	printf("el hilo del servidor leyó: %s\n",fileNameToReadReciveFromClient);
 
+	int bytesToSendToClient = getBytesToRead(fileNameToReadReciveFromClient);
 	openedFileDescriptorToRead = open(fileNameToReadReciveFromClient,O_RDONLY);
 
+	write(globalListaPipesRespuesta[pipeToSendToClient][1],&bytesToSendToClient,sizeof(int));
+
+
 	if (openedFileDescriptorToRead == -1){
-		perror("Archivo no encontrado");
+		printf("Archivo no encontrado: %s\n",fileNameToReadReciveFromClient);
 		exit(1);
 	}
 
+	while ( ( read(openedFileDescriptorToRead,&readedByteFromFile,1) ) == 1){
+		write(globalListaPipesRespuesta[pipeToSendToClient][1],&readedByteFromFile,1);
+	}
 
+	printf("misión cumplida\n");
+	freePipes(pipeToSendToClient);
 
 	pthread_exit(0);
-
 
 }
 
@@ -97,4 +94,34 @@ void setGlobalPipes(int *aceptarAccesoServidor,int *solicitudAccesoServidor,int 
 	close(globalAceptarAccesoServidor[0]);
 	close(globalSolicitudAccesoServidor[1]);
 
+}
+
+int getClientAvaliablePipeIndex(){
+	for (int indexToReturn = 0; indexToReturn < 5; indexToReturn++){
+
+		if (defaultpipes.pipesLibres[indexToReturn] == 1){
+			defaultpipes.pipesLibres[indexToReturn] = 0;
+			return indexToReturn;
+		}
+
+	}
+	return -1;
+}
+
+
+void freePipes(int pipeToFree){
+	defaultpipes.pipesLibres[pipeToFree] = 1;
+}
+
+int getBytesToRead(char *fileToRead){
+	int openedFile = open(fileToRead,O_RDONLY);
+	char byte;
+	int numberOfBytes = 0;
+
+	while ( ( read(openedFile,&byte,1) ) == 1){
+		numberOfBytes++;
+	}
+
+	close(openedFile);
+	return numberOfBytes;
 }
