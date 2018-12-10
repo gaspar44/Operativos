@@ -54,6 +54,10 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	}
 
 	fclose(exitFile);
+	close(listaPipesRespuesta[pipeIDForListaPipe][0]);
+	close(listaPipesPeticion[pipeIDForListaPipe][1]);
+	close(aceptarAccesoServidor[0]);
+	close(solicitudAccesoServidor[1]);
 	printf("Archivo salida_pid_%d_cliente.html creado. Favor revisar. Cliente terminando\n",clientPID);
 
 }
