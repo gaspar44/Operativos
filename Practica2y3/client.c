@@ -36,12 +36,7 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 	char serverAnswerByByte;
 	char *fileAnswer = malloc(100*sizeof(char));
 	getFileNameOfAnswer(clientPID,fileAnswer);
-
-	int exitFile = open(fileAnswer,O_WRONLY|O_APPEND|O_CREAT,0666);
-
-	close(1);
-	dup(exitFile);
-	close(exitFile);
+	FILE* exitFile = fopen(fileAnswer,"w");
 
 	if (write(solicitudAccesoServidor[1],&clientPID,sizeof(int)) <= 0)
 		perror("Error to write to pipe");
@@ -54,8 +49,11 @@ void startClient(char* actualLine,int *aceptarAccesoServidor,int *solicitudAcces
 
 	while ( bytesToRead != 0) {
 		read(listaPipesRespuesta[pipeIDForListaPipe][0],&serverAnswerByByte,1);
-		printf("%c",serverAnswerByByte);
+		fprintf(exitFile,"%c",serverAnswerByByte);
 		bytesToRead--;
 	}
+
+	fclose(exitFile);
+	printf("Archivo salida_pid_%d_cliente.html creado. Favor revisar. Cliente terminando\n",clientPID);
 
 }
