@@ -55,6 +55,7 @@ void *startService(void *arg){
 	}
 
 	freePipes(pipeToSendToClient);
+	close(openedFileDescriptorToRead);
 
 	pthread_exit(0);
 
