@@ -32,22 +32,23 @@ void *startService(void *arg){
 	sem_wait(&clientSemaphore);
 
 	while ( (pipeToSendToClient = getClientAvaliablePipeIndex() ) == -1 );
+	write(globalAceptarAccesoServidor[1],&pipeToSendToClient,sizeof(int));
 
 	sem_post(&clientSemaphore);
 
-
-	write(globalAceptarAccesoServidor[1],&pipeToSendToClient,sizeof(int));
+	close(globalListaPipesPeticion[pipeToSendToClient][1]);
 	read(globalListaPipesPeticion[pipeToSendToClient][0],fileNameToReadReciveFromClient,10);
 
 	int bytesToSendToClient = getBytesToRead(fileNameToReadReciveFromClient);
 	openedFileDescriptorToRead = open(fileNameToReadReciveFromClient,O_RDONLY);
 
+	close(globalListaPipesRespuesta[pipeToSendToClient][0]);
 	write(globalListaPipesRespuesta[pipeToSendToClient][1],&bytesToSendToClient,sizeof(int));
 
 
 	if (openedFileDescriptorToRead == -1){
-		printf("Archivo no encontrado: %s\n",fileNameToReadReciveFromClient);
-		exit(1);
+		printf("Archivo: %s no encontrado \n",fileNameToReadReciveFromClient);
+		pthread_exit(0);
 	}
 
 	while ( ( read(openedFileDescriptorToRead,&readedByteFromFile,1) ) == 1){
@@ -56,6 +57,8 @@ void *startService(void *arg){
 
 	freePipes(pipeToSendToClient);
 	close(openedFileDescriptorToRead);
+	close(globalListaPipesPeticion[pipeToSendToClient][0]);
+	close(globalListaPipesRespuesta[pipeToSendToClient][1]);
 
 	pthread_exit(0);
 
